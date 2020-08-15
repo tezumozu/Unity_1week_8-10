@@ -1,0 +1,203 @@
+@startuml クラス図
+    namespace Punis{
+        Class Puni<<Mono>>{
+            -static Size[3] sizeList
+            -static Map<State,Sprite>  
+            -static int max_stuff
+            -static float growsTime
+            -PuniStatus status
+
+            +void setData(PuniStatus,Bottle)
+            +void moveBottle
+            -void proliferation()
+            -void grows()
+            -void eat()
+            -void desth()
+        }
+        
+
+        Enum Size{
+            S
+            M
+            L
+        }
+
+
+        class PuniStatus<<stract>>{
+            +float growTime
+            +int stuff
+            +Color color
+            +Color accumulationColor
+            +Food target
+            +int sizeIndex
+        }
+
+
+        interface IPinichable{
+            +pinch()
+        }
+
+
+        interface IEdibles{
+            +edible()
+        }
+
+
+        Puni <|-left- IPinichable
+        Puni <|-up- IEdibles
+
+        Puni <-down- PuniStatus
+
+        Puni <-down- Size
+
+        Puni --> Foods.IEatable
+    }
+
+
+
+    namespace Bottles{
+        class Bottle{
+            +IReadOnryReactiveProperty<bool> activeBottle
+            -BottleData data
+
+            +void addPuni(PuniStatus)
+            +void removePuni(PuniStatus)
+            +void addFood(FoodData)
+            +void removeFood(foodData)
+            +void setData(BottleData)
+        }
+
+        class BottleData<<stract>>{
+            +List<PuniStatus>puniList
+            +List<FoodData>foodList
+        } 
+
+
+        class BottleManager{
+            +movePuni(Puni,fromBottle,toBottle)
+        }
+
+
+        Bottle <-left- Punis.Puni:Obsever
+        Bottle <-- Foods.Food:Obsever
+    }
+
+
+
+    namespace Inputs{
+        interface IInoutEventProvider{
+            +IReadOnryReactiveProperty<Pinichable>Pinched
+            +IReadOnryReactiveProperty<Pinichable>Draged
+        }
+
+    }
+
+
+
+    namespace Foods{
+        Enum FoodKind{
+            NOMAL
+            SHURIMP
+            SEAWEED
+            MACKEREL
+        }
+
+
+        class Food<<Mono>>{
+            -FoodData foodData
+            +void setFoodData()
+        }
+
+
+        interface IEatable{
+            +Color eat()
+        }
+
+
+        class FoodData<<stract>>{
+            +eatableNum
+            +Sprite[eatableNum]SpriteList
+            +Color color
+            +stuff
+        }
+
+
+        class FoodFactory<<singleton>>{
+            -static Map<FoodKind,FoodData> FoodDataMap
+            +return Food makeFood(FoodKind)
+        }
+
+        
+        Food <|-left- IEatable
+        Food <|-- Punis.IPinichable
+        Food <-- FoodData
+    }
+
+
+
+    namespace Players{
+        class Player<<singleton>>{
+            -int money
+            -Map<Foods.FoodKind,num> FoodsMap
+            -List<BottleData>
+
+            +void addFood(FoodKind,num)
+            +void addBottle()
+            +void increaseMoney(int)
+            +void decreaseMoney(int)
+            +void init()
+            +void reset()
+        }
+    }
+
+
+
+    namespace Enemys{
+
+    }
+
+
+
+    namespace Shops{
+        class Saler<<singleton>>{
+            +void salePuni(Puni)
+        }
+
+
+        class Bayer<<singleton>>{
+            +void BayItem()
+        }
+    }
+
+
+
+    namespace DataSaves{
+        class DataAutoSave<<Mono>>{
+            +save()
+        }
+    }
+
+
+
+    namespace Modes{
+        Enum Modes{
+            SALE
+            NOMAL
+            MOVE
+        }
+
+
+        class ModeManager<<singleton>>{
+            +Modes currentMode
+            +changeMode(Modes)
+        }
+    }
+
+
+
+    namespace flags{
+        class flagManager{
+
+        }
+    }
+@enduml
