@@ -2,17 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FoodData : MonoBehaviour
-{
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+namespace Foods{
+    public struct FoodData{
+        public Color color;
+        public int eatableNum;
+        public Sprite[] sprites;
+        public float stuff;
+        public Vector3 pos;
     }
 }
+
