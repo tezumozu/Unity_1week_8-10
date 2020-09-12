@@ -3,7 +3,11 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - giveWakame
+  - giveRice
+  - giveEbi
+  - giveSaba
   layers:
   - Default
   - TransparentFX

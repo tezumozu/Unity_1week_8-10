@@ -11,7 +11,7 @@ using Punis;
 namespace Bottles{
     public class Bottle : MonoBehaviour
     {
-        static Bottle activeBottle;
+        public static Bottle activeBottle;
         private BottleData bottleData;
         private ReactiveProperty<bool> _activeFlag = new ReactiveProperty<bool>();
         public IReadOnlyReactiveProperty<bool> isActive
@@ -55,6 +55,7 @@ namespace Bottles{
         public void addPuni(PuniData data){
             bottleData.puniList.Add(data);
             //プレハブ生成
+            
             //データを代入
         }
 
@@ -64,10 +65,15 @@ namespace Bottles{
         }
 
 
-        public void addFood(FoodData data){
+        public void addFood(FoodKind kind){
+            Food food  = FoodFactory.factory.makeFood(kind);
+            if(food == null){
+                Debug.Log("ご飯がいっぱいです");
+                return;
+            }
+
+            FoodData data = food.getFoodData();
             bottleData.foodList.Add(data);
-            //プレハブ生成
-            //データを代入
         }
 
 

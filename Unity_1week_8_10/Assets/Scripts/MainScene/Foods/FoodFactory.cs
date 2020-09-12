@@ -44,6 +44,10 @@ namespace Foods{
         }
 
         public Food makeFood(FoodKind kind){
+            //foodの上限に達しているか
+            if(Food.isFoodMax()){
+                return null;
+            }
             FoodData data;
             data.stuff = 2.0f;
             data.color = (Color)colorMap[kind];

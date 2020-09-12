@@ -19,17 +19,37 @@ namespace Foods{
 
     public class Food : MonoBehaviour,IEatable,IPinchable
     {
+        //静的
+        private static int foodNum = 0; 
+        private static int maxFoodNum = 5;
+        private static Subject<Food> applyFood = new Subject<Food>(); 
+        public static IObservable<Food> rApplyFood
+        {
+            get{ return applyFood; }
+        }
+
+        //インスタンス
         float bottleSize = 6.3f;
-        
         private bool pinchFlag = false;
-        // Start is called before the first frame update         
         private FoodData foodData;
-        public static Subject<Food> applyFood = new Subject<Food>();  
+
+        private Subject<Unit> disAppear = new Subject<Unit>();
+        public IObservable<Unit> rDisAppear
+        {
+            get{ return disApply; }
+        }
+
+
+        
+
         void Start()
         {
+            foodNum++;
             this.UpdateAsObservable()
                 .Where(_ => this.pinchFlag == true)
                 .Subscribe(_ => pinching());
+
+            isActive(false);
         }
 
 
@@ -49,14 +69,19 @@ namespace Foods{
 
         public void setData(FoodData data,Bottle bottle){
             this.foodData = data;
+
+            //スプライトの変更
             SpriteRenderer sr = gameObject.GetComponent<SpriteRenderer>();
             sr.sprite = foodData.sprites[foodData.eatableNum]; 
             
+            //ボトルの表示を監視
             bottle.isActive
             .Subscribe(flag => this.isActive(flag));
 
+            //表示状況の設定
             isActive(bottle.isActive.Value);
 
+            //ご飯の出現をぷ二に通知
             applyFood.OnNext(this);
         }
 
@@ -96,6 +121,17 @@ namespace Foods{
 
         private void isActive(bool flag){
             gameObject.SetActive(flag);
+        }
+
+        public FoodData getFoodData(){
+            return this.foodData;
+        }
+
+        public static bool isFoodMax (){
+            if(maxFoodNum >= foodNum){
+                return true;
+            }
+            return false;
         }
     }
 }
