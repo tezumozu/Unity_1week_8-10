@@ -17,11 +17,13 @@ namespace Foods{
         KOME,
     }
 
+
+
     public class Food : MonoBehaviour,IEatable,IPinchable
     {
         //静的
         private static int foodNum = 0; 
-        private static int maxFoodNum = 5;
+        private const int maxFoodNum = 5;
         private static Subject<Food> applyFood = new Subject<Food>(); 
         public static IObservable<Food> rApplyFood
         {
@@ -29,17 +31,14 @@ namespace Foods{
         }
 
         //インスタンス
-        float bottleSize = 6.3f;
         private bool pinchFlag = false;
         private FoodData foodData;
-
-        private Subject<Unit> disAppear = new Subject<Unit>();
-        public IObservable<Unit> rDisAppear
+        private IDisposable bottleDispos;
+        private Subject<Unit> disappear = new Subject<Unit>();
+        public IObservable<Unit> rDisappear
         {
-            get{ return disApply; }
+            get{ return disappear; }
         }
-
-
         
 
         void Start()
@@ -55,15 +54,41 @@ namespace Foods{
 
         public Color eat(){//食べられた時の処理
             foodData.eatableNum--;
+
+            //食べられきったら
             if(foodData.eatableNum <= 0){
+                disappear.OnCompleted();
+                bottleDispos.Dispose();
                 Destroy(gameObject);
                 
+                return foodData.color;
             }
 
+            //次のスプライトへ変更
             SpriteRenderer sr = gameObject.GetComponent<SpriteRenderer>();
             sr.sprite = foodData.sprites[foodData.eatableNum]; 
             
             return foodData.color;
+        }
+
+
+        public void setData(FoodData data){
+            this.foodData = data;
+            Bottle bottle = Bottle.activeBottle;
+
+            //スプライトの変更
+            SpriteRenderer sr = gameObject.GetComponent<SpriteRenderer>();
+            sr.sprite = foodData.sprites[foodData.eatableNum]; 
+            
+            //ボトルの表示を監視
+            bottleDispos = bottle.isActive
+            .Subscribe(flag => this.isActive(flag));
+
+            //表示状況の設定
+            isActive(bottle.isActive.Value);
+
+            //ご飯の出現をぷ二に通知
+            applyFood.OnNext(this);
         }
 
 
@@ -75,7 +100,7 @@ namespace Foods{
             sr.sprite = foodData.sprites[foodData.eatableNum]; 
             
             //ボトルの表示を監視
-            bottle.isActive
+            bottleDispos = bottle.isActive
             .Subscribe(flag => this.isActive(flag));
 
             //表示状況の設定
@@ -102,6 +127,7 @@ namespace Foods{
             mousePos = Camera.main.ScreenToWorldPoint(mousePos);
             if(checkOutSide(mousePos)){
                 gameObject.transform.position = mousePos;
+                foodData.pos = mousePos;
             }
         }
 
@@ -111,7 +137,7 @@ namespace Foods{
                 return false;
             }
 
-            if(Math.Pow( Math.Pow(vec.x,2) + Math.Pow(vec.y,2) ,1/2) < bottleSize){
+            if(Math.Pow( Math.Pow(vec.x,2) + Math.Pow(vec.y,2) ,1/2) < Bottle.bottleSize){
                 return false;
             }   
 
@@ -123,15 +149,22 @@ namespace Foods{
             gameObject.SetActive(flag);
         }
 
+
         public FoodData getFoodData(){
             return this.foodData;
         }
+
 
         public static bool isFoodMax (){
             if(maxFoodNum >= foodNum){
                 return true;
             }
             return false;
+        }
+
+
+        public Vector3 getPos(){
+            return foodData.pos;
         }
     }
 }

@@ -6,7 +6,7 @@ using Punis;
 using Foods;
 
 namespace Bottles{
-    public class BottleData{//セーブデータ管理用
+    public struct BottleData{//セーブデータ管理用
         public List<FoodData> foodList;
         public List<PuniData> puniList;
 

@@ -11,7 +11,10 @@ using Punis;
 namespace Bottles{
     public class Bottle : MonoBehaviour
     {
+        public const float bottleSize = 6.3f;
         public static Bottle activeBottle;
+
+
         private BottleData bottleData;
         private ReactiveProperty<bool> _activeFlag = new ReactiveProperty<bool>();
         public IReadOnlyReactiveProperty<bool> isActive
@@ -37,26 +40,22 @@ namespace Bottles{
         }
 
 
+        //データのセット
         public void setData(BottleData data){//データをもとに復元
             this.bottleData = data;
 
             for(int i = 0; i < data.puniList.Count; i++){
-                //プレハブ生成
-                //データを代入
+                Puni.makeNewPuni(data.puniList[i],this);
             }
 
             for(int i = 0; i < data.foodList.Count; i++){
-                //プレハブ生成
-                //データを代入
+                FoodFactory.factory.makeNewFood(data.foodList[i],this);
             }
         }
 
 
         public void addPuni(PuniData data){
             bottleData.puniList.Add(data);
-            //プレハブ生成
-            
-            //データを代入
         }
 
 
@@ -66,7 +65,7 @@ namespace Bottles{
 
 
         public void addFood(FoodKind kind){
-            Food food  = FoodFactory.factory.makeFood(kind);
+            Food food  = FoodFactory.factory.makeNewFood(kind);
             if(food == null){
                 Debug.Log("ご飯がいっぱいです");
                 return;
@@ -87,6 +86,9 @@ namespace Bottles{
             bottleData.puniList = new List<PuniData>();
             bottleData.foodList = new List<FoodData>();
         }
+
+
+        
     }
 }
 

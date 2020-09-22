@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+using Bottles;
 namespace Foods{
     public class FoodFactory
     {
+        private static GameObject prefab;
         private static FoodFactory factoryInstance;
         public static FoodFactory factory
         {
@@ -20,6 +22,8 @@ namespace Foods{
         static private Dictionary<FoodKind,Sprite[]> spriteMap = new Dictionary<FoodKind,Sprite[]>();
         static private Dictionary<FoodKind,Color> colorMap = new Dictionary<FoodKind,Color>();
         private FoodFactory(){
+            prefab = (GameObject)Resources.Load("Prefab/Food");
+
             //データの追加
             spriteMap.Add(FoodKind.EBI,getSprite(FoodKind.EBI));
             spriteMap.Add(FoodKind.WAKAME,getSprite(FoodKind.WAKAME));
@@ -43,7 +47,7 @@ namespace Foods{
             return result;
         }
 
-        public Food makeFood(FoodKind kind){
+        public Food makeNewFood(FoodKind kind){
             //foodの上限に達しているか
             if(Food.isFoodMax()){
                 return null;
@@ -56,10 +60,19 @@ namespace Foods{
             data.pos = new Vector3(0,0,0);
 
             //プレハブ生成
-            Food result = new Food();
+
+            Food result = GameObject.Instantiate(prefab).GetComponent<Food>();
             //データをセット
+            result.setData(data);
 
             return result;
+        }
+
+        public Food makeNewFood(FoodData data,Bottle bottle){
+            Food food = GameObject.Instantiate(prefab).GetComponent<Food>();
+            food.setData(data,bottle);
+
+            return food;
         }
     }
 
